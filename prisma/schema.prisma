@@ -9,3 +9,77 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id             Int                  @id @default(autoincrement())
+  name           String?
+  email          String?              @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  conversation   UserToConversation[]
+  seenMessages   seenToMessage[]
+  accouts        Account[]
+  messages       Message[]
+}
+
+model Account {
+  id                Int     @id @default(autoincrement())
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            Int     @unique
+
+  @@unique([provider, providerAccountId])
+}
+
+model Conversation {
+  id            Int                  @id @default(autoincrement())
+  creaetedAt    DateTime             @default(now())
+  lastMessageAt DateTime             @default(now())
+  name          String?
+  isGroup       Boolean?
+  users         UserToConversation[]
+  messageIds    Int[]
+  messages      Message[]
+}
+
+model Message {
+  id              Int             @id @default(autoincrement())
+  body            String?
+  image           String?
+  createdAt       DateTime        @default(now())
+  users           seenToMessage[]
+  conversationIds Int
+  conversation    Conversation    @relation(fields: [conversationIds], references: [id], onDelete: Cascade)
+  senderId        Int             @unique
+  sender          User            @relation(fields: [senderId], references: [id], onDelete: Cascade)
+}
+
+model UserToConversation {
+  user           User         @relation(fields: [userId], references: [id])
+  userId         Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId Int
+
+  @@id([userId, conversationId])
+}
+
+model seenToMessage {
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  message   Message @relation(fields: [messageId], references: [id])
+  messageId Int
+
+  @@id([userId, messageId])
+}
