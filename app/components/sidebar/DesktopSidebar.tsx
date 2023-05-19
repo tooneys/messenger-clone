@@ -3,11 +3,18 @@
 import useRoutes from '@/app/hooks/useRoutes';
 import { useState } from 'react';
 import DesktopItem from './DesktopItem';
+import { User } from '@prisma/client';
+import Avator from '@/app/components/Avator';
 
-const DesktopSidebar = () => {
+interface DesktopSidebarProps {
+  currentUser: User;
+}
+
+const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ currentUser }) => {
   const routes = useRoutes();
   const [isOpen, setIsOpen] = useState(false);
 
+  console.log({ currentUser });
   return (
     <div
       className="
@@ -31,7 +38,7 @@ const DesktopSidebar = () => {
         <ul role="list" className="flex flex-col items-center space-y-1">
           {routes.map((item) => (
             <DesktopItem
-              key={item.label}
+              key={item.href}
               href={item.href}
               label={item.label}
               icon={item.icon}
@@ -40,6 +47,14 @@ const DesktopSidebar = () => {
             />
           ))}
         </ul>
+      </nav>
+      <nav className="mt-4 flex flex-col justify-between items-center">
+        <div
+          className="cursor-pointer hover:opacity-75 transition"
+          onClick={() => setIsOpen(true)}
+        >
+          <Avator user={currentUser} />
+        </div>
       </nav>
     </div>
   );
