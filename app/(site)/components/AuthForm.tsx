@@ -1,37 +1,37 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
-import Input from "../../components/inputs/input";
-import Button from "@/app/components/Button";
-import AuthSocialButton from "./AuthSocialButton";
+import { useCallback, useEffect, useState } from 'react';
+import { useForm, FieldValues, SubmitHandler } from 'react-hook-form';
+import Input from '../../components/inputs/input';
+import Button from '@/app/components/Button';
+import AuthSocialButton from './AuthSocialButton';
 
-import { BsFillAlarmFill, BsGithub, BsGoogle } from "react-icons/bs";
-import axios from "axios";
-import { toast } from "react-hot-toast";
-import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { BsFillAlarmFill, BsGithub, BsGoogle } from 'react-icons/bs';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import { signIn, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
-type Variant = "LOGIN" | "REGISTER";
+type Variant = 'LOGIN' | 'REGISTER';
 
 const AuthForm = () => {
   const session = useSession();
   const router = useRouter();
-  const [variant, setVariant] = useState<Variant>("LOGIN");
+  const [variant, setVariant] = useState<Variant>('LOGIN');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (session?.status === "authenticated") {
-      console.log("Authenticated");
-      router.push("/users");
+    if (session?.status === 'authenticated') {
+      console.log('Authenticated');
+      router.push('/users');
     }
   }, [session?.status, router]);
 
   const toggleVariant = useCallback(() => {
-    if (variant === "LOGIN") {
-      setVariant("REGISTER");
+    if (variant === 'LOGIN') {
+      setVariant('REGISTER');
     } else {
-      setVariant("LOGIN");
+      setVariant('LOGIN');
     }
   }, [variant]);
 
@@ -41,37 +41,37 @@ const AuthForm = () => {
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
+      name: '',
+      email: '',
+      password: '',
     },
   });
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
 
-    if (variant === "REGISTER") {
+    if (variant === 'REGISTER') {
       //axios Register
       axios
-        .post("/api/register", data)
-        .then(() => signIn("credentials", data))
-        .catch(() => toast.error("Something went wrong!"))
+        .post('/api/register', data)
+        .then(() => signIn('credentials', data))
+        .catch(() => toast.error('Something went wrong!'))
         .finally(() => setIsLoading(false));
     }
 
-    if (variant === "LOGIN") {
+    if (variant === 'LOGIN') {
       // NextAuth Sign In
-      signIn("credentials", {
+      signIn('credentials', {
         ...data,
         redirect: false,
       })
         .then((callback) => {
           if (callback?.error) {
-            toast.error("Invalid credentials");
+            toast.error('Invalid credentials');
           }
 
           if (callback?.ok && !callback?.error) {
-            toast.success("Logged in!");
+            toast.success('Logged in!');
           }
         })
         .finally(() => setIsLoading(false));
@@ -84,11 +84,11 @@ const AuthForm = () => {
     signIn(action, { redirect: false })
       .then((callback) => {
         if (callback?.error) {
-          toast.error("Invalid Credentials");
+          toast.error('Invalid Credentials');
         }
 
         if (callback?.ok && !callback?.error) {
-          toast.success("Logged in!");
+          toast.success('Logged in!');
         }
       })
       .finally(() => setIsLoading(false));
@@ -98,27 +98,31 @@ const AuthForm = () => {
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {variant === "REGISTER" && (
+          {variant === 'REGISTER' && (
+            // @ts-expect-error Server Component
             <Input id="name" label="Name" register={register} errors={errors} />
           )}
           <Input
             id="email"
             label="Email address"
             register={register}
+            // @ts-expect-error Server Component
             errors={errors}
             disabled={isLoading}
           />
+
           <Input
             id="password"
             label="Password"
             register={register}
+            // @ts-expect-error Server Component
             errors={errors}
             disabled={isLoading}
             type="password"
           />
           <div>
             <Button disabled={isLoading} fullWidth type="submit">
-              {variant === "LOGIN" ? "Sign in" : "Register"}
+              {variant === 'LOGIN' ? 'Sign in' : 'Register'}
             </Button>
           </div>
         </form>
@@ -149,22 +153,22 @@ const AuthForm = () => {
           <div className="mt-6 flex gap-2">
             <AuthSocialButton
               icon={BsGithub}
-              onClick={() => socialAction("github")}
+              onClick={() => socialAction('github')}
             />
             <AuthSocialButton
               icon={BsGoogle}
-              onClick={() => socialAction("google")}
+              onClick={() => socialAction('google')}
             />
           </div>
         </div>
         <div className="flex gap-2 justify-center text-sm mt-6 px-2 text-gray-500">
           <div>
-            {variant === "LOGIN"
-              ? "New to Messenger?"
-              : "Already have an account?"}
+            {variant === 'LOGIN'
+              ? 'New to Messenger?'
+              : 'Already have an account?'}
           </div>
           <div onClick={toggleVariant} className="underline cursor-pointer">
-            {variant === "LOGIN" ? "Create an account" : "Login"}
+            {variant === 'LOGIN' ? 'Create an account' : 'Login'}
           </div>
         </div>
       </div>
